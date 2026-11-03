@@ -136,5 +136,5 @@ ENV TERMINFO=/usr/share/terminfo
 EXPOSE 8000
 EXPOSE 8080
 
-ENTRYPOINT ["/usr/local/bin/render-start.sh"]
+ENTRYPOINT ["/bin/sh", "/usr/local/bin/render-start.sh"]
 
