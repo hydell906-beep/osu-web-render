@@ -209,8 +209,10 @@ fi
 echo "Starting osu-web..."
 
 # Render terminates TLS at its proxy; the container itself serves plain HTTP.
-runuser -u osuweb -- /bin/sh /app/docker/deployment/entrypoint.sh octane \
-    --server=frankenphp --port="${PORT:-10000}" --workers=1 --max-requests=100 &
+# Use Laravel's built-in HTTP server for the free-tier demo.
+# FrankenPHP's Octane worker repeatedly crashes before accepting requests.
+# This compatibility mode is single-process and is not intended for production traffic.
+runuser -u osuweb -- php artisan serve --host=0.0.0.0 --port="${PORT:-10000}" --no-reload &
 web_pid=$!
 
 # Stop the whole container when any required service dies, and forward shutdown.
