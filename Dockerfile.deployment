@@ -65,6 +65,10 @@ RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf && \
       libcap \
       libjpeg-turbo-utils \
       nginx \
+      mariadb-server \
+      redis \
+      libcap \
+      util-linux \
       php-zts-cli \
       php-zts-ds \
       php-zts-fileinfo \
