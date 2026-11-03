@@ -35,7 +35,7 @@ RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf && \
       unzip && \
     microdnf clean all
 
-RUN setcap -r /usr/bin/frankenphp || true
+RUN setcap -r /usr/bin/frankenphp && getcap /usr/bin/frankenphp
 
 RUN corepack enable yarn
 
