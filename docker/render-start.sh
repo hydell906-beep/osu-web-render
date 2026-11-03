@@ -60,7 +60,12 @@ echo "Creating osu database..."
 mariadb \
     --socket=/run/mysqld/mysqld.sock \
     -u root <<SQL
+
 CREATE DATABASE IF NOT EXISTS osu
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+CREATE DATABASE IF NOT EXISTS osu_chat
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
@@ -71,6 +76,9 @@ ALTER USER 'osuweb'@'127.0.0.1'
 IDENTIFIED BY '${DB_PASSWORD}';
 
 GRANT ALL PRIVILEGES ON osu.*
+TO 'osuweb'@'127.0.0.1';
+
+GRANT ALL PRIVILEGES ON osu_chat.*
 TO 'osuweb'@'127.0.0.1';
 
 FLUSH PRIVILEGES;
