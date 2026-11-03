@@ -11,6 +11,7 @@ RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf && \
     microdnf install -y \
       frankenphp \
       git \
+      libcap \
       nodejs \
       php-zts-cli \
       php-zts-ds \
@@ -35,7 +36,7 @@ RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf && \
       unzip && \
     microdnf clean all
 
-RUN setcap -r /usr/bin/frankenphp && getcap /usr/bin/frankenphp
+RUN if [ -n "$(getcap /usr/bin/frankenphp)" ]; then setcap -r /usr/bin/frankenphp; fi
 
 RUN corepack enable yarn
 
@@ -123,9 +124,11 @@ COPY --from=build /app /app
 WORKDIR /app
 
 RUN useradd -m osuweb
-RUN chown -R osuweb /var/lib/nginx bootstrap/cache storage
+RUN chown -R osuweb /var/lib/nginx bootstrap/cache storage public/uploads public/uploads-avatar public/uploads-replay
 
-RUN setcap -r /usr/bin/frankenphp
+RUN if [ -n "$(getcap /usr/bin/frankenphp)" ]; then setcap -r /usr/bin/frankenphp; fi
+
+COPY docker/render-php.ini /etc/php-zts/conf.d/zzz-render.ini
 
 COPY docker/render-start.sh /usr/local/bin/render-start.sh
 RUN chmod +x /usr/local/bin/render-start.sh
@@ -133,8 +136,7 @@ RUN chmod +x /usr/local/bin/render-start.sh
 ENV LOG_CHANNEL=stderr
 ENV TERMINFO=/usr/share/terminfo
 
-EXPOSE 8000
-EXPOSE 8080
+EXPOSE 10000
 
 ENTRYPOINT ["/bin/sh", "/usr/local/bin/render-start.sh"]
 

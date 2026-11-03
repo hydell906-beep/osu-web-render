@@ -1,5 +1,10 @@
 # Deployment with docker
 
+For this fork's all-in-one Render image, follow [RENDER.md](RENDER.md).
+`Dockerfile.deployment` now starts the embedded databases and migrations; the
+separate-service commands below describe the upstream deployment entrypoint,
+not the default Render entrypoint.
+
 There's only one image to be built:
 
     docker build -f Dockerfile.deployment --tag <repository>:<tag> --build-arg <buildarg1> --build-arg <buildarg2> .
