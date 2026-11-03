@@ -17,7 +17,7 @@ $mysqlDefaults = [
     'password' => env('DB_PASSWORD', ''),
     'port' => env('DB_PORT', '3306'),
     'charset' => 'utf8mb4',
-    'collation' => 'utf8mb4_0900_ai_ci',
+    'collation' => 'utf8mb4_unicode_ci',
     'prefix' => '',
     /*
      * This should match latest sane default[1].
