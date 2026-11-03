@@ -3,6 +3,18 @@ set -eu
 
 cd /app
 
+# Restore the Laravel front controller if asset generation or a runtime step removed it.
+if [ ! -s /app/public/index.php ]; then
+    echo "WARNING: /app/public/index.php missing; restoring from image backup..." >&2
+    if [ -s /usr/local/share/osu-web-index.php ]; then
+        cp /usr/local/share/osu-web-index.php /app/public/index.php
+        chmod 644 /app/public/index.php
+    else
+        echo "ERROR: Laravel front controller missing and no backup exists; rebuild the image." >&2
+        exit 1
+    fi
+fi
+
 # Check password
 : "${DB_PASSWORD:?DB_PASSWORD must be configured}"
 
