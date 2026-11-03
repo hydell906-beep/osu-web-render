@@ -135,4 +135,7 @@ ENV TERMINFO /usr/share/terminfo
 EXPOSE 8000
 EXPOSE 8080
 
-ENTRYPOINT ["/app/docker/deployment/entrypoint.sh"]
+COPY docker/render-start.sh /usr/local/bin/render-start.sh
+RUN chmod +x /usr/local/bin/render-start.sh
+
+ENTRYPOINT ["/usr/local/bin/render-start.sh"]
