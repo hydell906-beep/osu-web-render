@@ -123,6 +123,8 @@ FROM runenv AS run
 COPY --from=build /app /app
 # Ensure the Laravel HTTP front controller survives asset/docs generation.
 COPY public/index.php /app/public/index.php
+# Keep a separate immutable copy for startup recovery and fail the build if missing.
+RUN install -m 644 /app/public/index.php /usr/local/share/osu-web-index.php && test -s /app/public/index.php
 WORKDIR /app
 
 RUN useradd -m osuweb
