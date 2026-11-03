@@ -195,8 +195,12 @@ web_pid=$!
 
 # Stop the whole container when any required service dies, and forward shutdown.
 while kill -0 "$web_pid" 2>/dev/null; do
-    if ! kill -0 "$mysql_pid" 2>/dev/null || ! kill -0 "$valkey_pid" 2>/dev/null; then
-        echo "ERROR: a required database service exited" >&2
+    if ! mariadb-admin --socket=/run/mysqld/mysqld.sock ping --silent >/dev/null 2>&1; then
+        echo "ERROR: MariaDB is not responding" >&2
+        exit 1
+    fi
+    if ! valkey-cli -h 127.0.0.1 ping 2>/dev/null | grep -qx PONG; then
+        echo "ERROR: Valkey is not responding" >&2
         exit 1
     fi
     sleep 2
