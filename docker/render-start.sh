@@ -63,6 +63,7 @@ mariadbd \
     --datadir=/var/lib/mysql \
     --socket=/run/mysqld/mysqld.sock \
     --bind-address=127.0.0.1 \
+    --log-error=/dev/stderr \
     --skip-name-resolve \
     --innodb-buffer-pool-size=64M \
     --innodb-log-buffer-size=8M \
@@ -84,13 +85,19 @@ until mariadb-admin \
     ping --silent; do
 
     if ! kill -0 "$mysql_pid" 2>/dev/null; then
-        echo "ERROR: MariaDB exited during startup" >&2
+        echo "ERROR: MariaDB exited during startup; checking diagnostic logs" >&2
+        for log in /var/log/mariadb/mariadb.log /var/log/mysql/mysqld.log /var/lib/mysql/*.err; do
+            if [ -f "$log" ]; then
+                echo "--- $log ---" >&2
+                tail -n 80 "$log" >&2 || true
+            fi
+        done
         exit 1
     fi
     i=$((i + 1))
 
     if [ "$i" -ge 60 ]; then
-        echo "ERROR: MariaDB failed to start"
+        echo "ERROR: MariaDB failed to start" >&2
         exit 1
     fi
 
