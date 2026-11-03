@@ -183,7 +183,27 @@ echo "Running Laravel migrations..."
 
 # Discard config cached during a previous container start before migrations.
 runuser -u osuweb -- php artisan config:clear
-runuser -u osuweb -- php artisan migrate --force
+
+# Bound migration time and emit progress even when Artisan is silent.
+# Without this, Render can remain in "Deploying" with no diagnostic output.
+echo "Migration started at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+runuser -u osuweb -- timeout --signal=TERM --kill-after=15s 420s php artisan migrate --force &
+migration_pid=$!
+migration_seconds=0
+while kill -0 "$migration_pid" 2>/dev/null; do
+    sleep 10
+    migration_seconds=$((migration_seconds + 10))
+    if kill -0 "$migration_pid" 2>/dev/null; then
+        echo "Migration still running after ${migration_seconds}s; waiting (limit: 420s)..."
+    fi
+done
+if wait "$migration_pid"; then
+    echo "Laravel migrations completed successfully."
+else
+    status=$?
+    echo "ERROR: Laravel migrations failed or timed out (exit status: $status)." >&2
+    exit "$status"
+fi
 
 # Start osu-web
 echo "Starting osu-web..."
