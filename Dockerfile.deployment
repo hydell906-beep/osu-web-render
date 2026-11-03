@@ -121,6 +121,8 @@ RUN printf "%s" "$GIT_SHA" > version
 FROM runenv AS run
 
 COPY --from=build /app /app
+# Ensure the Laravel HTTP front controller survives asset/docs generation.
+COPY public/index.php /app/public/index.php
 WORKDIR /app
 
 RUN useradd -m osuweb
