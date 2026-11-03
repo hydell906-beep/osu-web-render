@@ -117,25 +117,24 @@ ARG GIT_SHA
 RUN printf "%s" "$GIT_SHA" > version
 
 
-FROM runenv as run
+FROM runenv AS run
 
 COPY --from=build /app /app
 WORKDIR /app
 
-
 RUN useradd -m osuweb
 RUN chown -R osuweb /var/lib/nginx bootstrap/cache storage
-RUN setcap -r /usr/bin/frankenphp && getcap /usr/bin/frankenphp
-USER osuweb
-ENV LOG_CHANNEL stderr
-# fix broken readline in php console
-ENV TERMINFO /usr/share/terminfo
 
-
-EXPOSE 8000
-EXPOSE 8080
+RUN setcap -r /usr/bin/frankenphp
 
 COPY docker/render-start.sh /usr/local/bin/render-start.sh
 RUN chmod +x /usr/local/bin/render-start.sh
 
+ENV LOG_CHANNEL=stderr
+ENV TERMINFO=/usr/share/terminfo
+
+EXPOSE 8000
+EXPOSE 8080
+
 ENTRYPOINT ["/usr/local/bin/render-start.sh"]
+
